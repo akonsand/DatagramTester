@@ -1,6 +1,7 @@
 package com.verocoda.datagramtester;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -35,9 +37,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        UDP_Client client = new UDP_Client();
-        client.Message = "";
-        client.send();
+
     }
 
     @Override
@@ -61,12 +61,89 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void run100_100(View view) {
+        UDP_Client client = new UDP_Client();
+        client.context = getApplicationContext();
+        client.iterations = 8929;
+        client.sleep_time = 350;
+        client.run_time = 100;
+        client.send();
+    }
+
+    public void run100_50(View view) {
+        UDP_Client client = new UDP_Client();
+        client.context = getApplicationContext();
+        client.iterations = 8929;
+        client.sleep_time = 350;
+        client.run_time = 50;
+        client.send();
+    }
+
+
+    public void run50_100(View view) {
+        UDP_Client client = new UDP_Client();
+        client.context = getApplicationContext();
+        client.iterations = 4465;
+        client.sleep_time = 650;
+        client.run_time = 100;
+        client.send();
+    }
+
+
+    public void run50_50(View view) {
+        UDP_Client client = new UDP_Client();
+        client.context = getApplicationContext();
+        client.iterations = 4465;
+        client.sleep_time = 650;
+        client.run_time = 50;
+        client.send();
+    }
+
+    public void run20_100(View view) {
+        UDP_Client client = new UDP_Client();
+        client.context = getApplicationContext();
+        client.iterations = 1786;
+        client.sleep_time = 850;
+        client.run_time = 100;
+        client.send();
+    }
+
+    public void run20_50(View view) {
+        UDP_Client client = new UDP_Client();
+        client.context = getApplicationContext();
+        client.iterations = 1786;
+        client.sleep_time = 850;
+        client.run_time = 50;
+        client.send();
+    }
+
+    public void run5_100(View view) {
+        UDP_Client client = new UDP_Client();
+        client.context = getApplicationContext();
+        client.iterations = 447;
+        client.sleep_time = 950;
+        client.run_time = 100;
+        client.send();
+    }
+
+    public void run5_50(View view) {
+        UDP_Client client = new UDP_Client();
+        client.context = getApplicationContext();
+        client.iterations = 447;
+        client.sleep_time = 950;
+        client.run_time = 50;
+        client.send();
+    }
 }
 
 
 class UDP_Client {
     private AsyncTask<Void, Void, Void> async_cient;
-    public String Message;
+    public int sleep_time;
+    public int iterations;
+    public int run_time;
+    public Context context;
 
     @SuppressLint("NewApi")
     public void send() {
@@ -79,16 +156,20 @@ class UDP_Client {
                     ds = new DatagramSocket();
                     long time = System.currentTimeMillis();
                     Log.d("UDP_Client","current time " + System.currentTimeMillis());
-                    DatagramPacket dp = new DatagramPacket(Message.getBytes(), Message.length(), InetAddress.getLoopbackAddress(), 50002);
-                    Log.d("UDP_Client", "DP contents " + new String(dp.getData()));
-                    for(int i=0;i<8929;i++) {
-                        //ds.setBroadcast(true);
-                        ds.send(dp);
-                        //Log.d("UDP_Client", "dp to string " + dp.toString());
+                    byte[] data = new byte[1470];
+                    DatagramPacket dp = new DatagramPacket(data, 1470, InetAddress.getLocalHost(), 50002);
+                    Log.d("UDP_Client", "DP contents " + dp.getLength());
+                    for(int j=0;j<run_time;j++) {
+                        for (int i = 0; i < iterations ; i++) {
+                            //ds.setBroadcast(true);
+                            ds.send(dp);
+                            //Log.d("UDP_Client", "dp to string " + dp.toString());
+                        }
+                        Thread.sleep(sleep_time);
                     }
                     Log.d("UDP_Client","current time " + System.currentTimeMillis());
                     Log.d("UDP_Client","difference time " + (System.currentTimeMillis() - time));
-
+                    publishProgress();
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -97,6 +178,12 @@ class UDP_Client {
                     }
                 }
                 return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(Void... values) {
+                super.onProgressUpdate(values);
+                Toast.makeText(context,"Completed test",Toast.LENGTH_LONG).show();
             }
 
             protected void onPostExecute(Void result) {
